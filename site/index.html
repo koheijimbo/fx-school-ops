@@ -1,0 +1,1006 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>政局×マーケット日報</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Shippori+Mincho:wght@600;700;800&family=Oswald:wght@500;600&display=swap">
+<style>
+/* Layout: one trading-desk sheet per 回 (日付+時刻, 4回/日). Sticky rail picks the 回; then the audio
+   console (fastest way in), then the numbers as ONE registry grouped by asset class — 日本/米国/為替/
+   商品/暗号資産, so ドル円 lives in exactly one place — then the chart read, causes, news, policy, the
+   slow-moving power structure, what to watch, dates, prose, the desk's own tools and link directory,
+   sources. Dark-first: the desk's navy and gold. */
+:root{
+  --bg:#0A1128; --bg2:#0E1838; --surface:#121E45; --surface2:#19285A; --line:#283C76;
+  --ink:#EEF2FA; --ink2:#B7C3E0; --ink3:#8696BD;
+  --gold:#D4AF37; --gold-soft:#F0DFA0; --cyan:#00E5FF;
+  --up:#FF8090; --down:#73B6FF; --warn:#FF5C77; --on-accent:#0A1128;
+  --seat-g1:#D4AF37; --seat-g2:#F0DFA0; --seat-o1:#00E5FF; --seat-o2:#2FA9C4; --seat-o3:#A8EEF5;
+  --seat-o4:#8FA3CC; --seat-o5:#5E6E99; --seat-o6:#C9D3EA; --seat-x:#3A4874; --on-seat:#0A1128;
+  --f-display:'Shippori Mincho','Hiragino Mincho ProN','Yu Mincho',serif;
+  --f-body:'Noto Sans JP','Hiragino Kaku Gothic ProN','Yu Gothic',Meiryo,sans-serif;
+  --f-num:'Oswald','Arial Narrow',Arial,sans-serif;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#EDF0F7; --bg2:#E2E7F2; --surface:#FBFCFE; --surface2:#F0F3FA; --line:#C7D0E5;
+    --ink:#0A1128; --ink2:#3A4A73; --ink3:#5D6C94;
+    --gold:#8A6808; --gold-soft:#A27C12; --cyan:#00697A;
+    --up:#C2203A; --down:#1A5CC0; --warn:#C2203A; --on-accent:#FFFDF4;
+    --seat-g1:#C9A227; --seat-g2:#E8D48F; --seat-o1:#22BFD6; --seat-o2:#2D97B0; --seat-o3:#A5E0E9;
+    --seat-o4:#8FA3CC; --seat-o5:#6E7EA8; --seat-o6:#BCC7E0; --seat-x:#9BA6C2; --on-seat:#0A1128;
+    color-scheme:light;
+  }
+}
+:root[data-theme="light"]{
+  --bg:#EDF0F7; --bg2:#E2E7F2; --surface:#FBFCFE; --surface2:#F0F3FA; --line:#C7D0E5;
+  --ink:#0A1128; --ink2:#3A4A73; --ink3:#5D6C94;
+  --gold:#8A6808; --gold-soft:#A27C12; --cyan:#00697A;
+  --up:#C2203A; --down:#1A5CC0; --warn:#C2203A; --on-accent:#FFFDF4;
+  --seat-g1:#C9A227; --seat-g2:#E8D48F; --seat-o1:#22BFD6; --seat-o2:#2D97B0; --seat-o3:#A5E0E9;
+  --seat-o4:#8FA3CC; --seat-o5:#6E7EA8; --seat-o6:#BCC7E0; --seat-x:#9BA6C2; --on-seat:#0A1128;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.75;-webkit-text-size-adjust:100%}
+h1,h2,h3,p,ul,ol,dl,dd,figure{margin:0}
+ul,ol{padding:0;list-style:none}
+a{color:var(--cyan);text-underline-offset:3px}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+
+/* ---- top rail ---- */
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+.topbar-in{max-width:1120px;margin-inline:auto;padding-inline:20px;padding-block:10px;display:flex;flex-wrap:wrap;gap:10px 20px;align-items:center;justify-content:space-between}
+.brand{display:flex;gap:10px;align-items:baseline;min-width:0}
+.brand b{font-family:var(--f-display);font-weight:800;font-size:19px;letter-spacing:.02em;white-space:nowrap}
+.brand span{font-size:11px;letter-spacing:.18em;color:var(--gold);font-weight:700;white-space:nowrap}
+.datenav{display:flex;gap:6px;align-items:center}
+.datenav button{background:var(--surface);border:1px solid var(--line);border-radius:8px;min-width:40px;height:38px;cursor:pointer;font-size:16px}
+.datenav button:disabled{opacity:.35;cursor:default}
+.datenav button:not(:disabled):hover{border-color:var(--gold)}
+.datenav select{background:var(--surface);border:1px solid var(--line);border-radius:8px;height:38px;padding-inline:10px;max-width:62vw;font-variant-numeric:tabular-nums}
+.secnav{max-width:1120px;margin-inline:auto;padding-inline:20px;overflow-x:auto;scrollbar-width:none}
+.secnav::-webkit-scrollbar{display:none}
+.secnav ul{display:flex;gap:2px;padding-block:0 8px;white-space:nowrap}
+.secnav a{display:block;padding:5px 12px;border-radius:999px;font-size:13px;color:var(--ink2);text-decoration:none;letter-spacing:.02em;transition:color .18s,background-color .18s}
+.secnav a:hover{color:var(--ink);background:var(--surface)}
+.secnav a[aria-current="true"]{color:var(--gold);background:var(--surface);box-shadow:inset 0 0 0 1px var(--line)}
+
+.wrap{max-width:1120px;margin-inline:auto;padding-inline:20px;padding-block:34px 88px;display:flex;flex-direction:column;gap:56px}
+section{display:flex;flex-direction:column;gap:16px;scroll-margin-top:122px}
+.sec-head{display:flex;flex-wrap:wrap;gap:4px 14px;align-items:baseline;border-bottom:1px solid var(--line);padding-bottom:10px;background:linear-gradient(90deg,var(--gold),transparent) bottom left/92px 1px no-repeat}
+.sec-head h2{font-family:var(--f-display);font-weight:700;font-size:25px;line-height:1.3;letter-spacing:.01em;text-wrap:balance}
+.sec-head p{font-size:13px;color:var(--ink3)}
+
+/* ---- masthead ---- */
+.mast{gap:14px}
+.mast-meta{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;font-size:13px;color:var(--ink2)}
+.mast-date{font-family:var(--f-num);font-size:20px;letter-spacing:.04em;color:var(--gold);font-weight:600}
+.badge{display:inline-block;padding:1px 10px;border-radius:999px;font-size:12px;font-weight:700;border:1px solid var(--gold);color:var(--gold)}
+.badge.prov{border-color:var(--warn);color:var(--warn)}
+.badge.slot{border-color:var(--cyan);color:var(--cyan)}
+.mast h1{font-family:var(--f-display);font-weight:800;font-size:clamp(28px,5vw,46px);line-height:1.25;text-wrap:balance;max-width:22em}
+.lede{font-size:16px;color:var(--ink2);max-width:44em}
+.takes{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface)}
+.takes li{padding:14px 18px;display:flex;gap:12px;align-items:baseline;border-top:1px solid var(--line);margin-top:-1px;border-left:1px solid var(--line);margin-left:-1px;min-width:0}
+.takes .n{font-family:var(--f-num);font-size:26px;line-height:1;color:var(--gold);font-weight:600}
+.takes p{font-size:14px;line-height:1.6;min-width:0}
+.notice{border:1px solid var(--warn);border-radius:10px;padding:10px 14px;font-size:13.5px;color:var(--ink)}
+.notice b{color:var(--warn)}
+
+/* ---- audio console ---- */
+.console{background:var(--surface);border:1px solid var(--line);border-radius:14px;border-top:3px solid var(--cyan);padding:18px 20px;display:flex;flex-direction:column;gap:12px}
+.console .meta{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;font-size:12.5px;color:var(--ink3);font-family:var(--f-num);letter-spacing:.03em}
+.console h3{font-family:var(--f-display);font-size:clamp(18px,4vw,23px);line-height:1.4;font-weight:700;text-wrap:balance}
+.console .sum{font-size:14px;color:var(--ink2)}
+audio{width:100%;display:block}
+.rates{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.rates .lbl{font-size:12px;color:var(--ink3)}
+button.rate{border:1px solid var(--line);background:transparent;border-radius:6px;padding:4px 11px;cursor:pointer;font-family:var(--f-num);font-size:12.5px}
+button.rate:hover{border-color:var(--cyan)}
+button.rate[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+details.tr{border-top:1px solid var(--line);padding-top:10px}
+details.tr summary{cursor:pointer;font-weight:700;font-size:14px}
+.lines{display:flex;flex-direction:column;gap:10px;margin-top:12px;max-width:46em}
+.ln{display:grid;grid-template-columns:4.6em minmax(0,1fr);gap:10px}
+.who{font-size:12px;font-weight:700;padding-top:4px}
+.who.A{color:var(--gold)} .who.B{color:var(--cyan)}
+.ln p{font-size:14.5px;line-height:1.8}
+
+/* ---- market tiles ---- */
+.grp{display:flex;flex-direction:column;gap:10px}
+.grp-lab{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline;font-size:12.5px;font-weight:700;letter-spacing:.12em;color:var(--cyan)}
+.grp-lab span{font-size:11.5px;letter-spacing:0;font-weight:400;color:var(--ink3)}
+.tiles{display:flex;flex-wrap:wrap;gap:12px}
+.tile{flex:1 1 300px;min-width:0;background:linear-gradient(180deg,var(--surface2),var(--surface));border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:4px}
+.tile .lab{font-size:12.5px;font-weight:700;color:var(--gold);letter-spacing:.04em}
+.tile .val{font-family:var(--f-num);font-weight:600;font-size:clamp(25px,6.4vw,36px);line-height:1.15;font-variant-numeric:tabular-nums;display:flex;flex-wrap:wrap;align-items:baseline;gap:0 5px}
+.tile .val span{white-space:nowrap}
+.tile .val small{font-family:var(--f-body);font-size:13px;font-weight:500;color:var(--ink2)}
+@media (max-width:640px){.tile{flex-basis:150px;padding:12px 14px}}
+.tile .chg{font-size:13.5px;font-weight:700;font-variant-numeric:tabular-nums}
+.chg.up{color:var(--up)} .chg.down{color:var(--down)} .chg.flat{color:var(--ink2)}
+.tile .asof{font-size:11.5px;color:var(--ink3)}
+.tile .note{font-size:12.5px;color:var(--ink2);line-height:1.55}
+.tile svg{display:block;width:100%;height:36px;margin-top:4px}
+
+/* ---- cards / news ---- */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.card{background:linear-gradient(180deg,var(--surface2),var(--surface));border:1px solid var(--line);border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.card h3{font-size:17px;line-height:1.45;font-weight:700;text-wrap:balance}
+.card p{font-size:14px;color:var(--ink2)}
+.kicker{font-size:11.5px;font-weight:700;letter-spacing:.12em;color:var(--cyan)}
+.driver{border-top:3px solid var(--gold)}
+.driver .no{font-family:var(--f-num);font-size:28px;line-height:1;color:var(--gold);font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{background:transparent;border:1px solid var(--line);border-radius:999px;padding:3px 12px;font-size:13px;cursor:pointer;color:var(--ink2)}
+.chip:hover{border-color:var(--gold);color:var(--ink)}
+.chip[aria-pressed="true"]{background:var(--gold);border-color:var(--gold);color:var(--on-accent);font-weight:700}
+.news{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface)}
+.news li{display:grid;grid-template-columns:96px minmax(0,1fr);gap:4px 16px;padding:14px 18px;border-top:1px solid var(--line)}
+.news li:first-child{border-top:none}
+.news .cat{font-size:12px;font-weight:700;color:var(--gold);padding-top:3px}
+.news .cat em{display:block;font-style:normal;font-size:11px;color:var(--ink3);font-weight:400}
+.news h3{font-size:15.5px;line-height:1.5;font-weight:700}
+.news p{font-size:13.5px;color:var(--ink2)}
+.news .foot{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin-top:4px;font-size:12px;color:var(--ink3)}
+.pill{display:inline-block;border:1px solid var(--ink3);border-radius:4px;padding:0 7px;font-size:11.5px;font-weight:700;color:var(--ink2);line-height:1.7}
+.pill.yen{border-color:var(--gold);color:var(--gold)} .pill.eq{border-color:var(--cyan);color:var(--cyan)}
+@media (max-width:560px){.news li{grid-template-columns:minmax(0,1fr)}}
+
+/* ---- movers ---- */
+.boards{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
+.board{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.board h3{font-size:12.5px;font-weight:700;letter-spacing:.1em;color:var(--cyan)}
+.board ol{display:flex;flex-direction:column;gap:6px}
+.board li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:baseline;font-size:13.5px}
+.board .nm{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.board .nm b{font-family:var(--f-num);font-weight:600;letter-spacing:.03em;margin-right:6px}
+.board .pc{font-family:var(--f-num);font-weight:600;font-variant-numeric:tabular-nums}
+
+/* ---- technical read ---- */
+.tech-note{font-size:13px;color:var(--ink3);max-width:46em}
+.tech-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:16px}
+.tq{background:linear-gradient(180deg,var(--surface2),var(--surface));border:1px solid var(--line);border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.tq-top{display:flex;flex-wrap:wrap;gap:2px 12px;align-items:baseline;justify-content:space-between}
+.tq-top .nm{font-size:13px;font-weight:700;letter-spacing:.06em;color:var(--gold)}
+.tq-top .px{font-family:var(--f-num);font-weight:600;font-size:27px;line-height:1.1;font-variant-numeric:tabular-nums}
+.tq .asof{font-size:11.5px;color:var(--ink3)}
+.rng{display:flex;flex-direction:column;gap:7px}
+.rng-lab{display:flex;justify-content:space-between;gap:10px;font-size:11.5px;letter-spacing:.1em;font-weight:700;color:var(--ink3)}
+.rng-track{position:relative;height:8px;border-radius:999px;background:var(--line)}
+.rng-fill{position:absolute;inset-block:0;left:0;border-radius:999px;background:linear-gradient(90deg,var(--cyan),var(--gold))}
+.rng-dot{position:absolute;top:50%;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 3px var(--bg)}
+.rng-ends{display:flex;justify-content:space-between;gap:10px;font-family:var(--f-num);font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--ink2)}
+.rng-meta{font-size:12.5px;color:var(--ink2);line-height:1.6}
+.rng-meta b{color:var(--ink);font-variant-numeric:tabular-nums}
+.tfs{display:flex;flex-wrap:wrap;gap:8px}
+.tf{display:flex;gap:7px;align-items:center;border:1px solid var(--line);border-radius:999px;padding:3px 12px;font-size:12.5px;background:var(--bg2)}
+.tf b{font-weight:700}
+.tf i{font-style:normal;font-weight:700}
+.tf i.up{color:var(--up)} .tf i.down{color:var(--down)} .tf i.flat{color:var(--ink3)}
+.ladder{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.ladder li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:4px 12px;align-items:baseline;padding:7px 13px;border-top:1px solid var(--line);font-size:13px}
+.ladder li:first-child{border-top:none}
+.ladder .lp{font-family:var(--f-num);font-weight:600;font-size:15px;font-variant-numeric:tabular-nums}
+.ladder .ll{color:var(--ink2);min-width:0}
+.ladder .lk{font-size:11px;letter-spacing:.08em;font-weight:700;color:var(--ink3);white-space:nowrap}
+.ladder li.res .lp{color:var(--up)} .ladder li.res .lk{color:var(--up)}
+.ladder li.sup .lp{color:var(--down)} .ladder li.sup .lk{color:var(--down)}
+.ladder li.now{background:var(--gold);color:var(--on-accent)}
+.ladder li.now .lp,.ladder li.now .ll,.ladder li.now .lk{color:var(--on-accent);font-weight:700}
+.reads{display:flex;flex-direction:column;gap:4px;font-size:13px}
+.reads li{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:4px 12px;align-items:baseline}
+.reads .rn{color:var(--ink3);min-width:0}
+.reads .rv{font-family:var(--f-num);font-weight:600;font-variant-numeric:tabular-nums}
+.reads .rs{font-size:12px;color:var(--ink2)}
+.tq .memo{font-size:13px;color:var(--ink2);line-height:1.65;padding-top:10px;border-top:1px solid var(--line)}
+
+/* ---- tools ---- */
+.tools{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}
+.tool{background:linear-gradient(180deg,var(--surface2),var(--surface));border:1px solid var(--line);border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.tool h3{font-family:var(--f-display);font-size:19px;font-weight:700;line-height:1.4}
+.tool .hint{font-size:12.5px;color:var(--ink3);line-height:1.6}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px 12px}
+.fld{display:flex;flex-direction:column;gap:4px;min-width:0}
+.fld label{font-size:11.5px;letter-spacing:.06em;font-weight:700;color:var(--ink3)}
+.fld input,.fld select{background:var(--bg2);border:1px solid var(--line);border-radius:8px;height:40px;padding-inline:11px;min-width:0;width:100%;font-variant-numeric:tabular-nums}
+.fld input:focus,.fld select:focus{border-color:var(--cyan)}
+.out{display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--line);padding-top:12px}
+.out-big{display:flex;flex-wrap:wrap;gap:2px 10px;align-items:baseline}
+.out-big .v{font-family:var(--f-num);font-weight:600;font-size:clamp(28px,6vw,38px);line-height:1.1;color:var(--gold);font-variant-numeric:tabular-nums}
+.out-big .u{font-size:13px;color:var(--ink2)}
+.out-rows{display:flex;flex-direction:column;gap:3px;font-size:13px}
+.out-rows li{display:flex;flex-wrap:wrap;gap:4px 10px;justify-content:space-between}
+.out-rows .k{color:var(--ink3)}
+.out-rows .v{font-family:var(--f-num);font-weight:600;font-variant-numeric:tabular-nums}
+.warnline{font-size:12.5px;color:var(--warn);line-height:1.6}
+.clock{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.clock li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:4px 12px;align-items:baseline;padding:10px 13px;border-top:1px solid var(--line)}
+.clock li:first-child{border-top:none}
+.clock li.open{background:var(--bg2)}
+.clock .cn{font-size:13px;font-weight:700;min-width:0}
+.clock .ct{font-family:var(--f-num);font-weight:600;font-size:17px;font-variant-numeric:tabular-nums;color:var(--ink2)}
+.clock .cs{font-size:11.5px;letter-spacing:.08em;font-weight:700;white-space:nowrap;color:var(--ink3)}
+.clock li.open .cs{color:var(--cyan)}
+.clock li.open .ct{color:var(--ink)}
+
+/* ---- directory ---- */
+.dir{display:flex;flex-direction:column;gap:26px}
+.dir-grp{display:flex;flex-direction:column;gap:10px}
+.dir-lab{display:flex;flex-wrap:wrap;gap:3px 12px;align-items:baseline;border-bottom:1px solid var(--line);padding-bottom:6px}
+.dir-lab b{font-size:12.5px;font-weight:700;letter-spacing:.12em;color:var(--cyan)}
+.dir-lab span{font-size:12px;color:var(--ink3)}
+.dir-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:8px 18px}
+.dir-list li{display:flex;flex-direction:column;gap:1px;min-width:0;padding:7px 0}
+.dir-list .t{font-size:14px;font-weight:700;overflow-wrap:anywhere}
+.dir-list .t.plain{color:var(--ink2)}
+.dir-list .d{font-size:12.5px;color:var(--ink3);line-height:1.55}
+.dir-list code{font-family:var(--f-num);font-size:12.5px;letter-spacing:.03em;color:var(--gold)}
+
+/* ---- policy / structure ---- */
+.rate-big{font-family:var(--f-num);font-weight:600;font-size:clamp(34px,6vw,52px);line-height:1.1;font-variant-numeric:tabular-nums}
+.facts{display:flex;flex-direction:column;gap:4px;font-size:14px;color:var(--ink2)}
+.facts li{padding-left:14px;position:relative}
+.facts li::before{content:"";position:absolute;left:0;top:.8em;width:6px;height:2px;background:var(--gold)}
+.vote{display:flex;flex-wrap:wrap;gap:10px 24px;align-items:center;padding-top:6px;border-top:1px solid var(--line)}
+.dots{display:flex;gap:5px;flex-wrap:wrap}
+.dot{width:16px;height:16px;border-radius:50%;background:var(--gold)}
+.dot.no{background:transparent;border:2.5px solid var(--cyan)}
+.vote p{font-size:12.5px;color:var(--ink2)}
+.roles{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 14px;font-size:14px}
+.roles dt{color:var(--ink3);font-size:12.5px;padding-top:2px}
+.roles dd{font-weight:700;text-align:right}
+.house{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.house-top{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:baseline}
+.house-top h3{font-family:var(--f-display);font-size:20px;font-weight:700}
+.house-top p{font-size:14.5px;font-weight:700;color:var(--gold)}
+.seatbar{position:relative;padding-top:26px}
+.segs{display:flex;height:44px;border-radius:8px;overflow:hidden}
+.seg{min-width:0;display:flex;align-items:center;overflow:hidden}
+.seg span{font-size:12.5px;font-weight:700;color:var(--on-seat);padding-left:10px;white-space:nowrap}
+.mark{position:absolute;top:18px;bottom:-4px;width:0;border-left:2px dashed var(--ink)}
+.mark span{position:absolute;top:-20px;font-size:11.5px;font-weight:700;white-space:nowrap;color:var(--ink)}
+.mark.l span{right:5px} .mark.r span{left:5px}
+.legend{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:12.5px;color:var(--ink2)}
+.legend li{display:flex;gap:6px;align-items:center}
+.sw{width:11px;height:11px;border-radius:3px;flex:none}
+.house .note{font-size:13.5px;color:var(--ink2)}
+.tl{display:flex;flex-direction:column;border-left:2px solid var(--line);padding-left:16px;gap:10px}
+.tl li{display:grid;grid-template-columns:88px minmax(0,1fr);gap:2px 12px;font-size:14px}
+.tl .d{font-family:var(--f-num);color:var(--cyan);font-weight:600;font-size:15px}
+@media (max-width:480px){.tl li{grid-template-columns:minmax(0,1fr)}}
+.flow{display:flex;flex-direction:column;gap:10px}
+.flow li{display:flex;gap:10px;align-items:stretch}
+.flow .box{flex:1 1 0;min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-size:14px;line-height:1.55}
+.flow .box.from{border-left:4px solid var(--gold);font-weight:700}
+.flow .box.to{border-left:4px solid var(--cyan);font-weight:700}
+.flow .ar{flex:none;align-self:center;color:var(--gold);font-weight:700}
+.flow .ar::before{content:"→"}
+@media (max-width:680px){.flow li{flex-direction:column;gap:2px}.flow .ar::before{content:"↓"}.flow li + li{margin-top:8px}}
+
+/* ---- table / calendar / prose ---- */
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:680px;font-size:13.5px}
+th,td{text-align:left;vertical-align:top;padding:10px 14px;border-top:1px solid var(--line);line-height:1.6}
+thead th{border-top:none;font-size:12.5px;background:var(--surface2);white-space:nowrap}
+th.w{color:var(--gold)} th.s{color:var(--cyan)}
+tbody th{font-weight:700;white-space:nowrap}
+td{color:var(--ink2)}
+.cal{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:8px 14px}
+.cal li{display:grid;grid-template-columns:96px minmax(0,1fr);gap:12px;align-items:baseline;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+.cal .d{font-family:var(--f-num);font-size:17px;font-weight:600;color:var(--gold);font-variant-numeric:tabular-nums}
+.cal p{font-size:14px;line-height:1.55}
+.cal .k{font-size:11.5px;color:var(--ink3);font-weight:700;margin-right:6px}
+.prose{display:flex;flex-direction:column;gap:20px;max-width:46em}
+.prose h3{font-family:var(--f-display);font-size:18px;font-weight:700;line-height:1.5;margin-bottom:4px}
+.prose h3 .kicker{display:block;margin-bottom:2px}
+.prose p{font-size:15px;color:var(--ink2);line-height:1.9}
+.prose .grpl{font-size:12px;font-weight:700;letter-spacing:.14em;color:var(--cyan);padding-top:8px;border-top:1px solid var(--line)}
+.src{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:4px 24px;font-size:13px}
+.src li{min-width:0;overflow-wrap:anywhere;color:var(--ink2)}
+.foot{font-size:12.5px;color:var(--ink3);display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--line);padding-top:16px}
+.empty{border:1px dashed var(--line);border-radius:12px;padding:36px 24px;display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.empty h1{font-family:var(--f-display);font-size:24px;font-weight:700}
+.empty p{color:var(--ink2);max-width:40em}
+.hollow{border:1px dashed var(--line);border-radius:12px;padding:20px 22px;display:flex;flex-direction:column;gap:6px}
+.hollow p{font-size:14px;color:var(--ink2);max-width:42em}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+</style>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brand"><b>政局×マーケット日報</b><span>日米 · 1日4回</span></div>
+    <div class="datenav">
+      <button type="button" id="prevBtn" aria-label="前の回へ" disabled>‹</button>
+      <label for="dateSel" hidden>表示する回</label>
+      <select id="dateSel" aria-label="表示する回" disabled><option>読み込み中</option></select>
+      <button type="button" id="nextBtn" aria-label="次の回へ" disabled>›</button>
+    </div>
+  </div>
+  <nav class="secnav" aria-label="セクション">
+    <ul>
+      <li><a href="#onsei">音声</a></li>
+      <li><a href="#shikyo">市況</a></li>
+      <li><a href="#tech">テクニカル分析</a></li>
+      <li><a href="#zairyo">材料</a></li>
+      <li><a href="#news">ニュース</a></li>
+      <li><a href="#ugoki">注目銘柄</a></li>
+      <li><a href="#kinyu">金融政策</a></li>
+      <li><a href="#kozo">政治構造</a></li>
+      <li><a href="#keiro">伝達経路</a></li>
+      <li><a href="#kakunin">確認ポイント</a></li>
+      <li><a href="#nittei">日程</a></li>
+      <li><a href="#kaisetsu">解説</a></li>
+      <li><a href="#tool">ツール</a></li>
+      <li><a href="#dir">ディレクトリ</a></li>
+      <li><a href="#shutten">出典</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main class="wrap" id="app">
+  <div class="empty"><h1>きょうの回を読み込んでいます</h1><p>日本と米国の市況、音声、相場を動かした材料、政権と議会の構造、今後の日程がここに並びます。毎日 7時・12時・18時・21時（日本時間）に更新されます。</p></div>
+</main>
+
+<script>
+(function(){
+'use strict';
+var app=document.getElementById('app'), sel=document.getElementById('dateSel'),
+    prevBtn=document.getElementById('prevBtn'), nextBtn=document.getElementById('nextBtn');
+var st={db:'loading', list:[], structure:null, picked:null, filter:'すべて', sig:'', rate:1};
+var WD=['日','月','火','水','木','金','土'];
+var SLOTN={'07:00':'朝','12:00':'昼','18:00':'夕','21:00':'夜'};
+/* one registry, grouped by asset class — ドル円 belongs to 為替 and nowhere else */
+var GROUPS=[['jp','日本','東京市場'],['us','米国','米国市場'],['fx','為替',''],['cmdty','商品',''],['crypto','暗号資産','']];
+var GNAME={jp:'日本',us:'米国',fx:'為替',cmdty:'商品',crypto:'暗号資産'};
+var VOICE={A:'ひまり',B:'玄野'};
+var TRENDN={up:'上向き',down:'下向き',flat:'横ばい'};
+
+function S(v){return typeof v==='string'?v:(v==null?'':String(v));}
+function A(v){return Array.isArray(v)?v:[];}
+function O(v){return (v&&typeof v==='object'&&!Array.isArray(v))?v:{};}
+function h(tag,attrs,kids){
+  var e=document.createElement(tag),k;
+  if(attrs){for(k in attrs){var v=attrs[k]; if(v==null||v===false)continue;
+    if(k==='class')e.className=v; else if(k==='text')e.textContent=S(v); else e.setAttribute(k,v===true?'':v);}}
+  [].concat(kids==null?[]:kids).forEach(function(c){ if(c==null||c===false)return; e.appendChild(typeof c==='string'?document.createTextNode(c):c); });
+  return e;
+}
+function safeUrl(u){return (typeof u==='string'&&/^https:\/\/[^\s"'<>]+$/.test(u))?u:null;}
+function link(text,url){var u=safeUrl(url); return u?h('a',{href:u,target:'_blank',rel:'noopener noreferrer',text:text}):document.createTextNode(S(text));}
+function validDate(d){return typeof d==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(d);}
+function validSlot(s){return typeof s==='string'&&/^\d{2}:\d{2}$/.test(s);}
+function dow(d){var p=d.split('-').map(Number); return new Date(Date.UTC(p[0],p[1]-1,p[2])).getUTCDay();}
+function jpDate(d){var p=d.split('-').map(Number); return p[0]+'年'+p[1]+'月'+p[2]+'日（'+WD[dow(d)]+'）';}
+function shortDate(d){var p=d.split('-').map(Number); return p[1]+'月'+p[2]+'日';}
+function slotLabel(s){return S(s)+(SLOTN[s]?' '+SLOTN[s]:'');}
+function editionLabel(b){return shortDate(b.date)+'（'+WD[dow(b.date)]+'）'+slotLabel(b.slot);}
+function nowJST(){return new Date(Date.now()+9*3600e3);}
+function mmss(s){s=Math.round(Number(s)||0); return Math.floor(s/60)+'分'+('0'+(s%60)).slice(-2)+'秒';}
+function stamp(iso){var t=Date.parse(S(iso)); if(isNaN(t))return ''; var j=new Date(t+9*3600e3);
+  return (j.getUTCMonth()+1)+'月'+j.getUTCDate()+'日 '+('0'+j.getUTCHours()).slice(-2)+':'+('0'+j.getUTCMinutes()).slice(-2)+'（日本時間）';}
+/* hours between an edition's own slot time and now, both read in JST */
+function hoursSince(b){
+  var p=S(b.date).split('-').map(Number), t=S(b.slot).split(':').map(Number);
+  var when=Date.UTC(p[0],p[1]-1,p[2],t[0]||0,t[1]||0), n=nowJST();
+  return (Date.UTC(n.getUTCFullYear(),n.getUTCMonth(),n.getUTCDate(),n.getUTCHours(),n.getUTCMinutes())-when)/3600e3;
+}
+function pnum(s){ if(typeof s==='number')return isFinite(s)?s:null; var v=parseFloat(S(s).replace(/,/g,'')); return isFinite(v)?v:null; }
+function decOf(s){var m=/\.(\d+)/.exec(S(s)); return m?Math.min(m[1].length,8):0;}
+function fmtN(v,d){return Number(v).toLocaleString('ja-JP',{minimumFractionDigits:d,maximumFractionDigits:d});}
+function secHead(title,sub){return h('div',{class:'sec-head'},[h('h2',{text:title}), sub?h('p',{text:sub}):null]);}
+function current(){ if(!st.list.length)return null; var i; if(st.picked){for(i=0;i<st.list.length;i++) if(st.list[i].id===st.picked) return st.list[i];} return st.list[0]; }
+
+/* ---------- market history (shared by sparkline and the technical read) ---------- */
+function histOf(id,upto){
+  var pts=[];
+  st.list.forEach(function(b){ if(b.id>upto)return;
+    A(b.markets).forEach(function(m){ if(m&&m.id===id&&typeof m.num==='number'&&isFinite(m.num)&&!m.carried) pts.push({k:b.id,v:m.num}); }); });
+  pts.sort(function(a,b){return a.k<b.k?-1:1;});
+  return pts;
+}
+function spark(id,upto){
+  var pts=histOf(id,upto).slice(-40);
+  if(pts.length<3)return null;
+  var lo=Infinity,hi=-Infinity; pts.forEach(function(p){lo=Math.min(lo,p.v);hi=Math.max(hi,p.v);}); if(hi===lo){hi+=1;lo-=1;}
+  var W=200,H=36,P=4, xy=pts.map(function(p,i){return [(P+(W-2*P)*i/(pts.length-1)).toFixed(1),(H-P-(H-2*P)*(p.v-lo)/(hi-lo)).toFixed(1)];});
+  var NS='http://www.w3.org/2000/svg', svg=document.createElementNS(NS,'svg');
+  svg.setAttribute('viewBox','0 0 '+W+' '+H); svg.setAttribute('preserveAspectRatio','none'); svg.setAttribute('role','img');
+  svg.setAttribute('aria-label',pts.length+'回分の推移。最小'+lo+'、最大'+hi);
+  var pl=document.createElementNS(NS,'polyline'); pl.setAttribute('points',xy.map(function(p){return p.join(',');}).join(' '));
+  pl.setAttribute('fill','none'); pl.setAttribute('stroke','var(--gold)'); pl.setAttribute('stroke-width','2'); pl.setAttribute('vector-effect','non-scaling-stroke'); pl.setAttribute('stroke-linejoin','round');
+  var c=document.createElementNS(NS,'circle'); c.setAttribute('cx',xy[xy.length-1][0]); c.setAttribute('cy',xy[xy.length-1][1]); c.setAttribute('r','3'); c.setAttribute('fill','var(--gold)');
+  svg.appendChild(pl); svg.appendChild(c); return svg;
+}
+function tile(m,upto){
+  m=O(m); var dir=S(m.dir), arrow=dir==='up'?'↑ ':dir==='down'?'↓ ':'';
+  return h('li',{class:'tile'},[
+    h('p',{class:'lab',text:m.label}),
+    h('p',{class:'val'},[h('span',{text:m.value}), m.unit?h('small',{text:m.unit}):null]),
+    m.change?h('p',{class:'chg '+(dir==='up'||dir==='down'?dir:'flat'),text:arrow+S(m.change)}):null,
+    m.asOf?h('p',{class:'asof',text:m.asOf}):null,
+    m.note?h('p',{class:'note',text:m.note}):null,
+    m.id?spark(S(m.id),upto):null
+  ]);
+}
+function pill(t){t=S(t); var c=/円|ドル/.test(t)?' yen':/株/.test(t)?' eq':''; return h('span',{class:'pill'+c,text:t});}
+
+/* ---------- seat bar ---------- */
+function seatBar(hs){
+  hs=O(hs); var parties=A(hs.parties).filter(function(p){return p&&typeof p.seats==='number'&&p.seats>0;});
+  var total=parties.reduce(function(s,p){return s+p.seats;},0); if(!total)return null;
+  var gi=0,oi=0;
+  var colored=parties.map(function(p){var side=S(p.side),col;
+    if(side==='gov'){col='var(--seat-g'+(Math.min(gi,1)+1)+')';gi++;}
+    else if(side==='other'){col='var(--seat-x)';}
+    else {col='var(--seat-o'+(Math.min(oi,5)+1)+')';oi++;}
+    return {p:p,col:col};});
+  var segs=h('div',{class:'segs'},colored.map(function(x){
+    var share=x.p.seats/total, e=h('div',{class:'seg',title:S(x.p.name)+' '+x.p.seats},
+      (share>=0.095&&x.col!=='var(--seat-x)'&&x.col!=='var(--seat-o5)')?h('span',{text:S(x.p.name)+' '+x.p.seats}):null);
+    e.style.flex=x.p.seats+' 1 0'; e.style.background=x.col; return e;}));
+  var marks=A(hs.lines).filter(function(l){return l&&typeof l.seats==='number'&&l.seats>0&&l.seats<total;}).map(function(l,i,arr){
+    var e=h('div',{class:'mark '+((arr.length===1||i%2===0)?'l':'r')},h('span',{text:S(l.label)+' '+l.seats})); e.style.left=(100*l.seats/total).toFixed(2)+'%'; return e;});
+  var legend=h('ul',{class:'legend'},colored.map(function(x){var sw=h('span',{class:'sw'}); sw.style.background=x.col; return h('li',null,[sw,S(x.p.name)+' '+x.p.seats]);}));
+  return h('div',{class:'house'},[
+    h('div',{class:'house-top'},[h('h3',{text:hs.name}), hs.headline?h('p',{text:hs.headline}):null]),
+    h('div',{class:'seatbar',role:'img','aria-label':S(hs.name)+'の議席構成。'+parties.map(function(p){return S(p.name)+p.seats;}).join('、')},[segs].concat(marks)),
+    legend,
+    hs.note?h('p',{class:'note',text:hs.note}):null,
+    hs.source?h('p',{class:'asof',text:hs.source}):null
+  ]);
+}
+
+/* ---------- sections ---------- */
+function masthead(b,latest){
+  var prov=S(b.status)==='provisional', gap=hoursSince(latest);
+  var kids=[
+    h('div',{class:'mast-meta'},[
+      h('span',{class:'mast-date',text:jpDate(b.date)}),
+      h('span',{class:'badge slot',text:slotLabel(b.slot)}),
+      h('span',{class:'badge'+(prov?' prov':''),text:S(b.edition)||(prov?'暫定版':'確定版')}),
+      b.updatedAt?h('span',{text:'最終更新 '+stamp(b.updatedAt)}):null
+    ]),
+    h('h1',{text:b.headline}),
+    b.lede?h('p',{class:'lede',text:b.lede}):null
+  ];
+  if(prov) kids.push(h('p',{class:'notice'},[h('b',{text:'暫定版です。'}),' 終値や当日の国会の動きは、次の回で反映されます。']));
+  if(b.id!==latest.id) kids.push(h('p',{class:'notice'},[h('b',{text:'過去の回を表示しています。'}),' 最新は'+editionLabel(latest)+'の回です。']));
+  else if(gap>=14) kids.push(h('p',{class:'notice'},[h('b',{text:'更新が'+Math.floor(gap)+'時間止まっています。'}),' 7時・12時・18時・21時の自動更新タスクが動いているか確認してください。']));
+  var t=A(b.takeaways); if(t.length) kids.push(h('ol',{class:'takes'},t.map(function(x,i){return h('li',null,[h('span',{class:'n',text:String(i+1)}),h('p',{text:x})]);})));
+  return h('section',{class:'mast'},kids);
+}
+function secAudio(b){
+  var a=O(b.audio), file=S(a.file), ok=/^audio\/[A-Za-z0-9_.-]+\.mp3$/.test(file);
+  var kids=[secHead('音声','キャスターと解説の掛け合いで約10分。台本も読めます')];
+  if(!ok){ kids.push(h('p',{class:'lede',text:'この回の音声はまだありません。'})); return h('section',{id:'onsei'},kids); }
+  var player=h('audio',{controls:true,preload:'metadata',src:file});
+  player.addEventListener('loadedmetadata',function(){player.playbackRate=st.rate;});
+  var rateBtns=[1,1.25,1.5].map(function(r){
+    var btn=h('button',{type:'button',class:'rate','aria-pressed':String(r===st.rate),text:(r===1?'1.0':String(r))+'×'});
+    btn.addEventListener('click',function(){ st.rate=r; player.playbackRate=r;
+      try{localStorage.setItem('soho-rate',String(r));}catch(e){}
+      [].forEach.call(document.querySelectorAll('button.rate'),function(x){x.setAttribute('aria-pressed',String(x===btn));}); });
+    return btn;});
+  var lines=A(a.lines).map(O);
+  kids.push(h('div',{class:'console'},[
+    h('div',{class:'meta'},[h('span',{text:slotLabel(b.slot)+'の回'}), a.seconds?h('span',{text:mmss(a.seconds)}):null,
+      lines.length?h('span',{text:'台本 '+lines.length+'本'}):null]),
+    h('h3',{text:S(a.title)||S(b.headline)}),
+    a.summary?h('p',{class:'sum',text:a.summary}):null,
+    player,
+    h('div',{class:'rates',role:'group','aria-label':'再生速度'},[h('span',{class:'lbl',text:'速度'})].concat(rateBtns)),
+    lines.length?h('details',{class:'tr'},[h('summary',{text:'台本を読む'}),
+      h('div',{class:'lines'},lines.map(function(l){return h('div',{class:'ln'},[
+        h('span',{class:'who '+(l.speaker==='B'?'B':'A'),text:VOICE[l.speaker]||''}), h('p',{text:l.text})]);}))]):null
+  ]));
+  return h('section',{id:'onsei'},kids);
+}
+function secMarkets(b){
+  var ms=A(b.markets).map(O).filter(function(m){return m.label;}); if(!ms.length)return null;
+  var kids=[secHead('市況','日本・米国・為替・商品・暗号資産。数字の下は取得時点')];
+  GROUPS.forEach(function(g){
+    var rows=ms.filter(function(m){return S(m.group)===g[0];}); if(!rows.length)return;
+    kids.push(h('div',{class:'grp'},[
+      h('p',{class:'grp-lab'},[h('b',{text:g[1]}), g[2]?h('span',{text:g[2]}):null]),
+      h('ul',{class:'tiles'},rows.map(function(m){return tile(m,b.id);}))]));
+  });
+  var rest=ms.filter(function(m){return !GROUPS.some(function(g){return g[0]===S(m.group);});});
+  if(rest.length) kids.push(h('div',{class:'grp'},[h('p',{class:'grp-lab'},h('b',{text:'その他'})),
+    h('ul',{class:'tiles'},rest.map(function(m){return tile(m,b.id);}))]));
+  return h('section',{id:'shikyo'},kids);
+}
+
+/* ---------- technical read ----------
+   Two layers, both描写 only: (1) where the latest number sits inside the range this page has
+   actually stored — computed here from editions, never asserted; (2) the levels and indicator
+   readings the 回 supplies in `technicals`. Neither states a direction to take. */
+function rangeStat(pts){
+  var lo=Infinity,hi=-Infinity;
+  pts.forEach(function(p){lo=Math.min(lo,p.v);hi=Math.max(hi,p.v);});
+  var cur=pts[pts.length-1].v, span=hi-lo;
+  var dirn=0,streak=0,i;
+  for(i=pts.length-1;i>0;i--){
+    var d=pts[i].v-pts[i-1].v, s=d>0?1:d<0?-1:0;
+    if(s===0)break;
+    if(dirn===0)dirn=s; else if(s!==dirn)break;
+    streak++;
+  }
+  return {lo:lo,hi:hi,cur:cur,pos:span>0?100*(cur-lo)/span:50,n:pts.length,
+          streak:streak,dir:dirn,from:pts[0].k,to:pts[pts.length-1].k};
+}
+function rangeBlock(m,r){
+  var d=decOf(m.value), pos=Math.max(0,Math.min(100,r.pos));
+  var fill=h('div',{class:'rng-fill'}); fill.style.width=pos.toFixed(1)+'%';
+  var dot=h('div',{class:'rng-dot'}); dot.style.left=pos.toFixed(1)+'%';
+  var meta=[h('b',{text:pos.toFixed(0)+'%'}),'の位置（安値=0% / 高値=100%）。'+r.n+'回分'];
+  if(r.streak>=2) meta.push('・'+(r.dir>0?'上昇':'下落')+r.streak+'回連続');
+  return h('div',{class:'rng'},[
+    h('div',{class:'rng-lab'},[h('span',{text:'保存分の安値'}),h('span',{text:'高値'})]),
+    h('div',{class:'rng-track',role:'img','aria-label':'保存分の安値'+fmtN(r.lo,d)+'から高値'+fmtN(r.hi,d)+'のうち、現在値は下から'+pos.toFixed(0)+'パーセントの位置'},[fill,dot]),
+    h('div',{class:'rng-ends'},[h('span',{text:fmtN(r.lo,d)}),h('span',{text:fmtN(r.hi,d)})]),
+    h('p',{class:'rng-meta'},meta)
+  ]);
+}
+function ladderBlock(t){
+  var lv=A(t.levels).map(O).filter(function(x){return pnum(x.price)!==null;});
+  if(!lv.length)return null;
+  var cur=pnum(t.price), d=decOf(t.price);
+  var rows=lv.map(function(x){return {n:pnum(x.price),label:S(x.label),kind:S(x.kind),txt:S(x.price)};});
+  if(cur!==null) rows.push({n:cur,now:true,label:'現在値',txt:S(t.price)});
+  rows.sort(function(a,b){return b.n-a.n;});
+  return h('ul',{class:'ladder'},rows.map(function(x){
+    var kind=x.now?'now':(x.kind==='res'||x.kind==='sup')?x.kind:(cur!==null?(x.n>cur?'res':'sup'):'');
+    var kl=x.now?'いま':kind==='res'?'上':kind==='sup'?'下':'';
+    return h('li',{class:kind},[
+      h('span',{class:'lp',text:x.txt||fmtN(x.n,d)}),
+      h('span',{class:'ll',text:x.label}),
+      kl?h('span',{class:'lk',text:kl}):null
+    ]);
+  }));
+}
+function techCard(t,m){
+  t=O(t);
+  var id=S(t.id), label=S(t.label)||S(O(m).label)||id;
+  var price=S(t.price)||S(O(m).value);
+  var r=null;
+  if(id){var pts=histOf(id,st.listUpto||''); if(pts.length>=3) r=rangeStat(pts);}
+  var tfs=A(t.timeframes).map(O).filter(function(x){return x.tf;});
+  var reads=A(t.readings).map(O).filter(function(x){return x.name;});
+  return h('div',{class:'tq'},[
+    h('div',{class:'tq-top'},[h('span',{class:'nm',text:label}), price?h('span',{class:'px',text:price}):null]),
+    t.asOf?h('p',{class:'asof',text:t.asOf}):null,
+    tfs.length?h('div',{class:'tfs'},tfs.map(function(x){
+      var tr=S(x.trend);
+      return h('span',{class:'tf',title:S(x.note)},[h('b',{text:S(x.tf)}),
+        h('i',{class:(tr==='up'||tr==='down')?tr:'flat',text:TRENDN[tr]||'—'})]);
+    })):null,
+    r?rangeBlock({value:price||String(r.cur)},r):null,
+    ladderBlock(t),
+    reads.length?h('ul',{class:'reads'},reads.map(function(x){return h('li',null,[
+      h('span',{class:'rn',text:x.name}),
+      h('span',{class:'rv',text:x.value}),
+      x.state?h('span',{class:'rs',text:x.state}):null]);})):null,
+    t.note?h('p',{class:'memo',text:t.note}):null
+  ]);
+}
+function secTech(b){
+  st.listUpto=b.id;
+  var ms=A(b.markets).map(O);
+  var tech=A(b.technicals).map(O).filter(function(t){return t.id||t.label;});
+  var cards=[];
+  tech.forEach(function(t){
+    var m=null, i;
+    for(i=0;i<ms.length;i++) if(S(ms[i].id)===S(t.id)) {m=ms[i];break;}
+    cards.push(techCard(t,m));
+  });
+  /* no levels supplied for a market? still show where its number sits in the stored range */
+  ms.forEach(function(m){
+    var id=S(m.id); if(!id||!m.label)return;
+    if(tech.some(function(t){return S(t.id)===id;}))return;
+    var pts=histOf(id,b.id); if(pts.length<3)return;
+    var r=rangeStat(pts);
+    cards.push(h('div',{class:'tq'},[
+      h('div',{class:'tq-top'},[h('span',{class:'nm',text:m.label}), h('span',{class:'px',text:m.value})]),
+      m.asOf?h('p',{class:'asof',text:m.asOf}):null,
+      rangeBlock(m,r),
+      h('p',{class:'memo',text:'このページが保存している'+r.n+'回分（'+r.from.slice(5).replace('-','/')+'〜'+r.to.slice(5).replace('-','/')+'）から算出した位置です。水準の内訳はまだ入っていません。'})
+    ]));
+  });
+  var kids=[secHead('テクニカル分析','意識される水準と指標の状態。価格の予測ではありません')];
+  kids.push(h('p',{class:'tech-note',text:'チャート上の水準と指標の読みを並べたものです。どちらに動くかを示すものではなく、売買を推奨・助言するものでもありません。時間足は「方向」を、水準は「場所」を見るために分けて置いています。'}));
+  if(!cards.length){
+    kids.push(h('div',{class:'hollow'},[
+      h('p',{text:'この回にはまだテクニカルの水準が入っていません。'}),
+      h('p',{text:'回のデータに technicals（銘柄ごとの時間足の向き・意識される水準・指標の状態）が入ると、ここに並びます。市況の数値が3回分たまった銘柄は、保存分のレンジ内での位置が自動で表示されます。'})
+    ]));
+  } else {
+    kids.push(h('div',{class:'tech-grid'},cards));
+  }
+  return h('section',{id:'tech'},kids);
+}
+
+function secDrivers(b){var d=A(b.drivers).map(O); if(!d.length)return null;
+  return h('section',{id:'zairyo'},[secHead('相場を動かした材料','どの経路の話かを先に仕分ける'),
+    h('ol',{class:'cards'},d.map(function(x,i){return h('li',{class:'card driver'},[
+      h('span',{class:'no',text:('0'+(i+1)).slice(-2)}), x.channel?h('span',{class:'kicker',text:x.channel}):null,
+      h('h3',{text:x.title}), h('p',{text:x.body})]);}))]);}
+function secNews(b){
+  var n=A(b.news).map(O); if(!n.length)return null;
+  var cats=['すべて']; n.forEach(function(x){var c=S(x.category); if(c&&cats.indexOf(c)<0)cats.push(c);});
+  if(cats.indexOf(st.filter)<0) st.filter='すべて';
+  var shown=n.filter(function(x){return st.filter==='すべて'||S(x.category)===st.filter;});
+  var chips=h('div',{class:'chips',role:'group','aria-label':'ジャンルで絞り込む'},cats.map(function(c){
+    var btn=h('button',{type:'button',class:'chip','aria-pressed':String(c===st.filter),text:c}); btn.addEventListener('click',function(){st.filter=c;render();}); return btn;}));
+  return h('section',{id:'news'},[secHead('取引に効くニュース',n.length+'本。ラベルは相場への向き'), chips,
+    h('ul',{class:'news'},shown.map(function(x){return h('li',null,[
+      h('span',{class:'cat'},[S(x.category), GNAME[S(x.group)]?h('em',{text:GNAME[S(x.group)]}):null]),
+      h('div',null,[h('h3',{text:x.title}), x.body?h('p',{text:x.body}):null,
+        h('div',{class:'foot'},A(x.impacts).map(pill).concat([x.source?h('span',null,['出典: ',link(S(x.source),x.url)]):null]))])]);}))]);}
+function secMovers(b){
+  var mv=A(b.movers).map(O); if(!mv.length)return null;
+  var boards=[['trending','注目されている'],['gainers','値上がり'],['losers','値下がり']];
+  var cols=boards.map(function(bd){
+    var rows=mv.filter(function(x){return S(x.board)===bd[0];}); if(!rows.length)return null;
+    return h('div',{class:'board'},[h('h3',{text:bd[1]}),
+      h('ol',null,rows.map(function(x){
+        var pc=typeof x.changePct==='number'?x.changePct:null;
+        return h('li',null,[
+          h('span',{class:'nm'},[h('b',{text:x.symbol}), S(x.name)]),
+          h('span',{class:'pc chg '+(pc>0?'up':pc<0?'down':'flat'),
+            text:pc===null?S(x.value):(pc>0?'+':'')+pc.toFixed(2)+'%'})]);}))]);
+  }).filter(Boolean);
+  if(!cols.length)return null;
+  return h('section',{id:'ugoki'},[secHead('米国の注目銘柄','スクリーナー上位。騰落率は取得時点のもの'), h('div',{class:'boards'},cols)]);}
+function secMonetary(s){var m=A(O(s).monetary).map(O); if(!m.length)return null;
+  return h('section',{id:'kinyu'},[secHead('金融政策','日米の政策金利と票の割れ方'),
+    h('div',{class:'cards'},m.map(function(x){var v=O(x.vote), nf=Math.max(0,Math.min(20,Number(v['for'])||0)), na=Math.max(0,Math.min(20,Number(v.against)||0)), dots=[],i;
+      for(i=0;i<nf;i++)dots.push(h('span',{class:'dot'})); for(i=0;i<na;i++)dots.push(h('span',{class:'dot no'}));
+      return h('div',{class:'card'},[
+        h('span',{class:'kicker',text:S(x.name)+(x.rateLabel?'｜'+S(x.rateLabel):'')}),
+        h('p',{class:'rate-big',text:x.rate}),
+        h('ul',{class:'facts'},A(x.facts).map(function(f){return h('li',{text:f});})),
+        (nf+na)?h('div',{class:'vote'},[h('div',{class:'dots',role:'img','aria-label':'賛成'+nf+'、反対'+na},dots),
+          h('p',{text:'● '+S(v.forLabel||'賛成')+' '+nf+'　○ '+S(v.againstLabel||'反対')+' '+na})]):null
+      ]);}))]);}
+function secStructure(s){s=O(s); var layers=A(s.layers).map(O), houses=A(s.houses), opp=O(s.opposition);
+  if(!layers.length&&!houses.length)return null;
+  var kids=[secHead('政治構造',s.asOf&&validDate(s.asOf)?shortDate(s.asOf)+'時点。人事や議席が動いた日に更新':'')];
+  if(s.summary) kids.push(h('p',{class:'lede',text:s.summary}));
+  if(layers.length) kids.push(h('div',{class:'cards'},layers.map(function(l){return h('div',{class:'card'},[
+    h('h3',{text:l.title}), l.sub?h('span',{class:'kicker',text:l.sub}):null,
+    h('dl',{class:'roles'},[].concat.apply([],A(l.members).map(function(m){m=O(m); return [h('dt',{text:m.role}),h('dd',{text:m.name})];}))),
+    l.note?h('p',{text:l.note}):null]);})));
+  houses.forEach(function(x){var e=seatBar(x); if(e)kids.push(e);});
+  if(A(opp.timeline).length||A(opp.notes).length){
+    kids.push(h('div',{class:'house'},[
+      h('div',{class:'house-top'},[h('h3',{text:S(opp.title)||'野党の再編'})]),
+      h('ol',{class:'tl'},A(opp.timeline).map(function(t){t=O(t); return h('li',null,[h('span',{class:'d',text:t.date}),h('span',{text:t.text})]);}))
+    ].concat(A(opp.notes).map(function(n){n=O(n); return h('p',{class:'note'},[h('b',{text:S(n.heading)+'　'}),S(n.body)]);}))));
+  }
+  return h('section',{id:'kozo'},kids);}
+function secChannels(s){var c=A(O(s).channels).map(O); if(!c.length)return null;
+  return h('section',{id:'keiro'},[secHead('政治が為替と株に伝わる経路','起点 → 中間で動くもの → 市場の反応'),
+    h('ul',{class:'flow'},c.map(function(x){return h('li',null,[h('div',{class:'box from',text:x.from}),h('span',{class:'ar','aria-hidden':'true'}),
+      h('div',{class:'box',text:x.mid}),h('span',{class:'ar','aria-hidden':'true'}),h('div',{class:'box to',text:x.to})]);})),
+    h('p',{class:'asof',text:'公開報道をもとにした整理で、因果を保証するものではありません。'})]);}
+function secWatch(b){var w=A(b.watch).map(O); if(!w.length)return null;
+  return h('section',{id:'kakunin'},[secHead('材料ごとの確認ポイント','条件の整理であり、価格や方向の予測ではありません'),
+    h('div',{class:'scroll'},h('table',null,[
+      h('thead',null,h('tr',null,[h('th',{scope:'col',text:'材料'}),h('th',{scope:'col',class:'w',text:'円安方向に働く条件'}),h('th',{scope:'col',class:'s',text:'円高方向に働く条件'}),h('th',{scope:'col',text:'株への含意'})])),
+      h('tbody',null,w.map(function(x){return h('tr',null,[h('th',{scope:'row',text:x.item}),h('td',{text:x.yenWeak}),h('td',{text:x.yenStrong}),h('td',{text:x.equity})]);}))]))]);}
+function secCal(b){var c=A(b.calendar).map(O); if(!c.length)return null;
+  return h('section',{id:'nittei'},[secHead('この先の重要日程','日付順'),
+    h('ol',{class:'cal'},c.map(function(x){return h('li',null,[h('span',{class:'d',text:x.date}),h('p',null,[x.kind?h('span',{class:'k',text:x.kind}):null,S(x.label)])]);}))]);}
+function secProse(b,s){
+  var a=A(b.analysis).map(O), sa=A(O(s).analysis).map(O); if(!a.length&&!sa.length)return null;
+  function blocks(list){return list.map(function(x){return h('div',null,[
+    h('h3',null,[GNAME[S(x.group)]?h('span',{class:'kicker',text:GNAME[S(x.group)]}):null, S(x.heading)]),
+    h('p',{text:x.body})]);});}
+  var kids=[]; if(a.length){kids.push(h('p',{class:'grpl',text:'この回の読み'})); kids=kids.concat(blocks(a));}
+  if(sa.length){kids.push(h('p',{class:'grpl',text:'構造の読み'})); kids=kids.concat(blocks(sa));}
+  return h('section',{id:'kaisetsu'},[secHead('解説','分析を文章でまとめたもの'),h('div',{class:'prose'},kids)]);}
+
+/* ---------- tools (client-side only; nothing here is stored or fetched) ---------- */
+var SESSIONS=[
+  {name:'東京',tz:'Asia/Tokyo',open:9,close:15,note:'株式 9:00–15:00'},
+  {name:'ロンドン',tz:'Europe/London',open:8,close:17,note:'現地 8:00–17:00'},
+  {name:'ニューヨーク',tz:'America/New_York',open:8,close:17,note:'現地 8:00–17:00'}
+];
+function tzParts(tz,now){
+  try{
+    var f=new Intl.DateTimeFormat('ja-JP',{timeZone:tz,hour:'2-digit',minute:'2-digit',weekday:'short',hour12:false});
+    var out={},i,ps=f.formatToParts(now);
+    for(i=0;i<ps.length;i++) out[ps[i].type]=ps[i].value;
+    return {hh:out.hour,mm:out.minute,wd:out.weekday,h:Number(out.hour)+Number(out.minute)/60};
+  }catch(e){return null;}
+}
+function clockBlock(){
+  var ul=h('ul',{class:'clock'});
+  function paint(){
+    var now=new Date();
+    ul.textContent='';
+    SESSIONS.forEach(function(s){
+      var p=tzParts(s.tz,now);
+      if(!p){ ul.appendChild(h('li',null,[h('span',{class:'cn',text:s.name}),h('span',{class:'ct',text:'—'}),h('span',{class:'cs',text:'取得できません'})])); return; }
+      var weekend=/土|日|Sat|Sun/.test(p.wd), open=!weekend&&p.h>=s.open&&p.h<s.close;
+      ul.appendChild(h('li',{class:open?'open':''},[
+        h('span',{class:'cn',text:s.name}),
+        h('span',{class:'ct',text:p.hh+':'+p.mm+' '+p.wd}),
+        h('span',{class:'cs',text:weekend?'週末':open?'取引時間':'時間外'})
+      ]));
+    });
+  }
+  paint();
+  if(st.clockTimer) clearInterval(st.clockTimer);
+  st.clockTimer=setInterval(paint,30000);
+  return ul;
+}
+/* pip size and the JPY value of one pip per 1 lot (100,000 units).
+   JPY-quoted pairs are exact. USD-quoted ones need a USDJPY rate from the user — the page
+   never invents one. */
+var PAIRS=[
+  {v:'USDJPY',label:'ドル円（USD/JPY）',pip:0.01,quote:'JPY'},
+  {v:'EURJPY',label:'ユーロ円（EUR/JPY）',pip:0.01,quote:'JPY'},
+  {v:'GBPJPY',label:'ポンド円（GBP/JPY）',pip:0.01,quote:'JPY'},
+  {v:'AUDJPY',label:'豪ドル円（AUD/JPY）',pip:0.01,quote:'JPY'},
+  {v:'EURUSD',label:'ユーロドル（EUR/USD）',pip:0.0001,quote:'USD'},
+  {v:'GBPUSD',label:'ポンドドル（GBP/USD）',pip:0.0001,quote:'USD'},
+  {v:'AUDUSD',label:'豪ドル米ドル（AUD/USD）',pip:0.0001,quote:'USD'}
+];
+function fld(label,el){return h('div',{class:'fld'},[h('label',{for:el.id,text:label}),el]);}
+function numInput(id,val,step,min){return h('input',{id:id,type:'number',inputmode:'decimal',value:String(val),step:String(step),min:min==null?'0':String(min)});}
+function toolLot(){
+  var bal=numInput('t-bal',1000000,10000), rsk=numInput('t-rsk',2,0.1), stp=numInput('t-stp',50,1,1);
+  var pairSel=h('select',{id:'t-pair'},PAIRS.map(function(p){return h('option',{value:p.v,text:p.label});}));
+  var usdjpy=numInput('t-uj','',0.01);
+  var ujWrap=fld('USD/JPY レート（米ドル建てペアの換算用）',usdjpy);
+  var big=h('p',{class:'out-big'},[h('span',{class:'v',text:'—'}),h('span',{class:'u',text:'ロット'})]);
+  var rows=h('ul',{class:'out-rows'});
+  var warn=h('p',{class:'warnline'});
+  function calc(){
+    var p=PAIRS.filter(function(x){return x.v===pairSel.value;})[0]||PAIRS[0];
+    ujWrap.hidden=(p.quote==='JPY');
+    var B=parseFloat(bal.value), R=parseFloat(rsk.value), SP=parseFloat(stp.value), UJ=parseFloat(usdjpy.value);
+    rows.textContent=''; warn.textContent='';
+    if(!isFinite(B)||!isFinite(R)||!isFinite(SP)||B<=0||R<=0||SP<=0){
+      big.firstChild.textContent='—'; warn.textContent='残高・リスク％・損切り幅を入れてください。'; return;
+    }
+    var risk=B*R/100, pipJpyPerLot;
+    if(p.quote==='JPY'){ pipJpyPerLot=100000*p.pip; }
+    else {
+      if(!isFinite(UJ)||UJ<=0){ big.firstChild.textContent='—'; warn.textContent='米ドル建てのペアは、換算用の USD/JPY レートを入れてください（このページは自分でレートを取りません）。'; return; }
+      pipJpyPerLot=100000*p.pip*UJ;
+    }
+    var lots=risk/(SP*pipJpyPerLot);
+    big.firstChild.textContent=lots>=10?lots.toFixed(1):lots.toFixed(2);
+    [['許容リスク額',Math.round(risk).toLocaleString('ja-JP')+' 円'],
+     ['1pipsの金額（1ロット）',Math.round(pipJpyPerLot).toLocaleString('ja-JP')+' 円'],
+     ['1pips動いたときの損益（目安）',Math.round(risk/SP).toLocaleString('ja-JP')+' 円'],
+     ['通貨数量',Math.round(lots*100000).toLocaleString('ja-JP')+' 通貨']
+    ].forEach(function(r){ rows.appendChild(h('li',null,[h('span',{class:'k',text:r[0]}),h('span',{class:'v',text:r[1]})])); });
+  }
+  [bal,rsk,stp,usdjpy].forEach(function(e){e.addEventListener('input',calc);});
+  pairSel.addEventListener('change',calc);
+  var el=h('div',{class:'tool'},[
+    h('h3',{text:'ロット計算'}),
+    h('p',{class:'hint',text:'許容リスク額 ÷（損切り幅 × 1pipsの金額）。初期値は残高100万円・リスク2％＝2万円。'}),
+    h('div',{class:'fields'},[fld('口座残高（円）',bal),fld('1回のリスク（％）',rsk),fld('損切り幅（pips）',stp),fld('通貨ペア',pairSel)]),
+    ujWrap,
+    h('div',{class:'out'},[big,rows,warn])
+  ]);
+  calc();
+  return el;
+}
+function toolRR(){
+  var en=numInput('r-en','',0.001,null), sl=numInput('r-sl','',0.001,null), tp=numInput('r-tp','',0.001,null);
+  var big=h('p',{class:'out-big'},[h('span',{class:'v',text:'—'}),h('span',{class:'u',text:'リスクリワード比（1 : R）'})]);
+  var rows=h('ul',{class:'out-rows'});
+  var warn=h('p',{class:'warnline'});
+  function calc(){
+    var E=parseFloat(en.value), L=parseFloat(sl.value), T=parseFloat(tp.value);
+    rows.textContent=''; warn.textContent='';
+    if(!isFinite(E)||!isFinite(L)||!isFinite(T)){ big.firstChild.textContent='—'; warn.textContent='3つの価格を入れてください。'; return; }
+    var risk=Math.abs(E-L), rew=Math.abs(T-E);
+    if(risk<=0){ big.firstChild.textContent='—'; warn.textContent='損切りが建値と同じです。'; return; }
+    var rr=rew/risk, need=100/(1+rr);
+    big.firstChild.textContent=rr.toFixed(2);
+    var items=[['損切りまでの幅',risk.toFixed(Math.max(decOf(en.value),decOf(sl.value)))],
+      ['利確までの幅',rew.toFixed(Math.max(decOf(en.value),decOf(tp.value)))],
+      ['損益ゼロに必要な勝率',need.toFixed(1)+' ％']];
+    items.forEach(function(r){ rows.appendChild(h('li',null,[h('span',{class:'k',text:r[0]}),h('span',{class:'v',text:r[1]})])); });
+    /* 1e-9 so an exact 1:2 (0.70 against 1.40 in binary floats) is not flagged */
+    if(rr<2-1e-9) warn.textContent='1:2 を下回っています（SOHOの既定は最小 1:2）。';
+  }
+  [en,sl,tp].forEach(function(e){e.addEventListener('input',calc);});
+  var el=h('div',{class:'tool'},[
+    h('h3',{text:'リスクリワード計算'}),
+    h('p',{class:'hint',text:'建値・損切り・利確の3つを入れると、比率と「損益ゼロに必要な勝率」が出ます。'}),
+    h('div',{class:'fields'},[fld('建値',en),fld('損切り',sl),fld('利確',tp)]),
+    h('div',{class:'out'},[big,rows,warn])
+  ]);
+  calc();
+  return el;
+}
+function secTools(){
+  return h('section',{id:'tool'},[
+    secHead('ツール','ブラウザの中だけで計算します。入力は保存されません'),
+    h('p',{class:'tech-note',text:'資金管理の計算を補助するものです。数量や価格を推奨するものではなく、売買の助言でもありません。既定値は口座残高100万円・1回のリスク2％・最小リスクリワード 1:2（SOHOの資金管理ルール）に合わせています。'}),
+    h('div',{class:'tools'},[
+      h('div',{class:'tool'},[
+        h('h3',{text:'3市場セッション時計'}),
+        h('p',{class:'hint',text:'各市場の現地時間で判定しています（夏時間は自動）。土日は週末と表示します。'}),
+        clockBlock(),
+        h('p',{class:'hint',text:'重なる時間帯（ロンドン × ニューヨーク）は値動きが大きくなりやすい時間帯として知られます。'})
+      ]),
+      toolLot(),
+      toolRR()
+    ])
+  ]);
+}
+
+/* ---------- link directory (static; the desk's own source list) ---------- */
+var DIR=[
+  {g:'中央銀行・政府機関',s:'一次情報。ここに書かれていないことは誰も確認できない',items:[
+    {t:'Federal Reserve｜FOMC',u:'https://www.federalreserve.gov/newsevents.htm',d:'声明・議事要旨・ドットチャート'},
+    {t:'ECB｜プレスリリース',u:'https://www.ecb.europa.eu/press/pr/date/html/index.en.html',d:'政策決定と理事会メンバーの発言'},
+    {t:'日本銀行',u:'https://www.boj.or.jp/',d:'政策決定会合・展望レポート・主な意見'},
+    {t:'Bank of England',u:'https://www.bankofengland.co.uk/news',d:'MPC決定と議事録'},
+    {t:'Reserve Bank of Australia',u:'https://www.rba.gov.au/speeches/',d:'理事会と講演'},
+    {t:'Bank of Canada',u:'https://www.bankofcanada.ca/press/',d:'政策金利と金融政策報告'},
+    {t:'Reserve Bank of New Zealand',u:'https://www.rbnz.govt.nz/hub/news',d:'OCR決定'},
+    {t:'Swiss National Bank',u:'https://www.snb.ch/en/the-snb/mandates-goals/monetary-policy',d:'政策と為替への姿勢'},
+    {t:'U.S. Treasury',u:'https://home.treasury.gov/news',d:'為替報告書・国債入札・制裁'},
+    {t:'財務省｜国際局',u:'https://www.mof.go.jp/policy/international_policy/',d:'為替介入実績（月次）'}
+  ]},
+  {g:'経済指標・統計',s:'発表の予定と原数値',items:[
+    {t:'ForexFactory｜経済カレンダー',u:'https://www.forexfactory.com/calendar',d:'重要度つきの指標カレンダー'},
+    {t:'FRED｜St. Louis Fed',u:'https://fred.stlouisfed.org/',d:'米マクロ時系列。APIキーは無料'},
+    {t:'U.S. Bureau of Labor Statistics',u:'https://www.bls.gov/',d:'雇用統計・CPI の一次発表'},
+    {t:'U.S. Bureau of Economic Analysis',u:'https://www.bea.gov/',d:'GDP・PCE の一次発表'},
+    {t:'U.S. Census Bureau',u:'https://www.census.gov/',d:'小売・住宅・貿易'},
+    {t:'総務省統計局',u:'https://www.stat.go.jp/',d:'全国・東京都区部CPI'},
+    {t:'内閣府｜経済社会総合研究所',u:'https://www.esri.cao.go.jp/',d:'GDP・景気動向指数'},
+    {t:'Eurostat',u:'https://ec.europa.eu/eurostat/',d:'ユーロ圏CPI・GDP'},
+    {t:'Office for National Statistics（UK）',u:'https://www.ons.gov.uk/',d:'英CPI・雇用'},
+    {t:'EIA｜週間石油在庫',u:'https://www.eia.gov/petroleum/supply/weekly/',d:'原油在庫'},
+    {t:'CFTC｜建玉明細',u:'https://www.cftc.gov/MarketReports/CommitmentsofTraders/index.htm',d:'投機筋のポジション（毎週金曜）'}
+  ]},
+  {g:'マーケット分析・金融メディア',s:'二次情報。必ず一次情報に当て直す',items:[
+    {t:'Reuters｜Markets',u:'https://www.reuters.com/markets/',d:'速報'},
+    {t:'Bloomberg｜Markets',u:'https://www.bloomberg.com/markets',d:'速報と分析'},
+    {t:'CNBC｜Markets',u:'https://www.cnbc.com/markets/',d:'米国時間の実況'},
+    {t:'ING Think',u:'https://think.ing.com/',d:'為替・金利のハウスビュー'},
+    {t:'Marc to Market',u:'https://www.marctomarket.com/',d:'為替の日次コメンタリー'},
+    {t:'DailyFX',u:'https://www.dailyfx.com/',d:'テクニカルとセンチメント'},
+    {t:'Finance Magnates',u:'https://www.financemagnates.com/',d:'業界・規制'},
+    {t:'OMFIF',u:'https://www.omfif.org/',d:'中銀と公的機関の調査'},
+    {t:'みんかぶ FX',u:'https://fx.minkabu.jp/',d:'日本時間の為替ニュース'},
+    {t:'ザイFX！',u:'https://zai.diamond.jp/fx',d:'NY市場概況（日本語）'}
+  ]},
+  {g:'地政学・マクロ',s:'相場より先に動くことがある',items:[
+    {t:'AP News｜Financial Markets',u:'https://apnews.com/hub/financial-markets',d:'国際ニュース'},
+    {t:'Channel News Asia｜Business',u:'https://www.channelnewsasia.com/business',d:'アジア発'},
+    {t:'衆議院｜議案・審議状況',u:'https://www.shugiin.go.jp/internet/itdb_gian.nsf/html/gian/menu.htm',d:'法案がどこまで進んだか'},
+    {t:'首相官邸',u:'https://www.kantei.go.jp/',d:'人事・記者会見'}
+  ]},
+  {g:'チャート・計算',s:'',items:[
+    {t:'TradingView',u:'https://jp.tradingview.com/',d:'チャートとアイデア共有'},
+    {t:'OANDA｜ポジション比率',u:'https://www.oanda.jp/lab-education/oanda_lab/oanda_rab/open_position_ratios/',d:'個人の建玉の偏り'}
+  ]}
+];
+var DIR_LOCAL=[
+  {t:'米国マクロ指標ダッシュボード（macro-fx-dashboard）',p:'http://localhost:3000',d:'FRED の雇用・インフレ 14系列。YoY / MoM / 12ヶ月Zスコアと60ヶ月チャート。手元で npm run dev して開く'},
+  {t:'North Star Deck',p:'ダッシュボード（Artifact）',d:'90日ロードマップの Day# と Today’s 3'},
+  {t:'SOHO AI Office',p:'ダッシュボード（Artifact）',d:'AI社員3人の実行ログ・承認待ち'}
+];
+function secDirectory(){
+  var groups=DIR.map(function(g){
+    return h('div',{class:'dir-grp'},[
+      h('div',{class:'dir-lab'},[h('b',{text:g.g}), g.s?h('span',{text:g.s}):null]),
+      h('ul',{class:'dir-list'},g.items.map(function(x){
+        return h('li',null,[h('span',{class:'t'},link(x.t,x.u)), x.d?h('span',{class:'d',text:x.d}):null]);
+      }))
+    ]);
+  });
+  groups.push(h('div',{class:'dir-grp'},[
+    h('div',{class:'dir-lab'},[h('b',{text:'自分でつくったもの'}), h('span',{text:'手元で動かすもの。リンクは開かない'})]),
+    h('ul',{class:'dir-list'},DIR_LOCAL.map(function(x){
+      return h('li',null,[h('span',{class:'t plain',text:x.t}), h('span',{class:'d'},[h('code',{text:x.p}),' — '+x.d])]);
+    }))
+  ]));
+  return h('section',{id:'dir'},[
+    secHead('ディレクトリ','この日報が参照している情報源の一覧'),
+    h('p',{class:'tech-note',text:'上にあるものほど一次情報に近く、下にいくほど誰かの解釈が混ざります。二次情報で見つけた数字は、必ず上の段に当て直してから使います。'}),
+    h('div',{class:'dir'},groups)
+  ]);
+}
+
+function secSources(b,s){var a=A(b.sources).map(O).concat(A(O(s).sources).map(O)), seen={}, items=[];
+  a.forEach(function(x){var key=S(x.url)||S(x.title); if(!key||seen[key])return; seen[key]=1; items.push(x);});
+  return h('section',{id:'shutten'},[secHead('出典',items.length?items.length+'件':''),
+    items.length?h('ul',{class:'src'},items.map(function(x){return h('li',null,link(S(x.title)||S(x.url),x.url));})):null,
+    h('div',{class:'foot'},[
+      b.notes?h('p',{text:b.notes}):null,
+      h('p',{text:'毎日 7時・12時・18時・21時（日本時間）に自動で更新されます。土日は市場が休みのため、週のまとめと翌週の日程を中心に更新します。'}),
+      h('p',{text:'音声：VOICEVOX:冥鳴ひまり（キャスター）、VOICEVOX:玄野武宏（解説）。台本は Claude が作成しています。'}),
+      h('p',{text:'テクニカル分析・ツールの各欄は、水準と計算を並べたものです。特定の売買を推奨・助言するものではありません。'}),
+      h('p',{text:'※本ページは情報提供および教育目的のものであり、特定の金融商品の売買を推奨・助言するものではありません。投資判断はご自身の責任において行ってください。'})])]);}
+
+/* ---------- render ---------- */
+function syncNav(b){
+  var sig=st.list.map(function(x){return x.id+(S(x.status)==='provisional'?'p':'');}).join('|');
+  if(sig!==st.sig){ st.sig=sig; sel.textContent='';
+    st.list.forEach(function(x){sel.appendChild(h('option',{value:x.id,text:editionLabel(x)+(S(x.status)==='provisional'?'・暫定':'')}));}); }
+  sel.disabled=!st.list.length;
+  if(!st.list.length){sel.textContent=''; sel.appendChild(h('option',{text:'回なし'})); st.sig=''; prevBtn.disabled=nextBtn.disabled=true; return;}
+  sel.value=b.id; var i=st.list.indexOf(b); prevBtn.disabled=i>=st.list.length-1; nextBtn.disabled=i<=0;
+}
+/* mark the section the reader is in, on the rail */
+var navLinks=[].slice.call(document.querySelectorAll('.secnav a'));
+function watchSections(){
+  if(st.obs){st.obs.disconnect(); st.obs=null;}
+  if(typeof IntersectionObserver!=='function')return;
+  var seen={};
+  st.obs=new IntersectionObserver(function(entries){
+    entries.forEach(function(e){seen[e.target.id]=e.isIntersecting?e.intersectionRatio:0;});
+    var best='',bv=0;
+    Object.keys(seen).forEach(function(k){if(seen[k]>bv){bv=seen[k];best=k;}});
+    navLinks.forEach(function(a){a.setAttribute('aria-current',String(bv>0&&a.getAttribute('href')==='#'+best));});
+  },{rootMargin:'-130px 0px -55% 0px',threshold:[0,.2,.6,1]});
+  navLinks.forEach(function(a){
+    var el=document.getElementById(a.getAttribute('href').slice(1));
+    if(el) st.obs.observe(el);
+  });
+}
+/* Tools and the directory do not belong to a 回 — they stay available even with no data,
+   so the page is never a dead end. */
+function emptyState(title,body){
+  app.textContent='';
+  app.appendChild(h('div',{class:'empty'},[h('h1',{text:title}),h('p',{text:body})]));
+  [secTools(),secDirectory()].forEach(function(p){if(p)app.appendChild(p);});
+  watchSections();
+}
+function render(){
+  var b=current();
+  if(!b){ syncNav(null);
+    if(st.db==='loading') return emptyState('きょうの回を読み込んでいます','日本と米国の市況、音声、相場を動かした材料、政権と議会の構造、今後の日程がここに並びます。下のツールとディレクトリは、回の読み込みを待たずに使えます。');
+    if(st.db==='nodb') return emptyState('データに接続できません','回を表示するには、Claudeにサインインした状態でこのページを開いてください。下のツールとディレクトリはこのままでも使えます。');
+    if(st.db==='error') return emptyState('データを読み込めませんでした','時間をおいてページを開き直してください。下のツールとディレクトリはこのままでも使えます。');
+    return emptyState('まだ回がありません','毎日 7時・12時・18時・21時（日本時間）に、その時点の市況と政治の動きをまとめた回が自動で追加されます。');
+  }
+  syncNav(b);
+  var s=st.structure, parts=[masthead(b,st.list[0]),secAudio(b),secMarkets(b),secTech(b),secDrivers(b),secNews(b),secMovers(b),
+    secMonetary(s),secStructure(s),secChannels(s),secWatch(b),secCal(b),secProse(b,s),secTools(),secDirectory(),secSources(b,s)];
+  app.textContent=''; parts.forEach(function(p){if(p)app.appendChild(p);});
+  watchSections();
+}
+sel.addEventListener('change',function(){st.picked=sel.value; st.filter='すべて'; render(); window.scrollTo(0,0);});
+prevBtn.addEventListener('click',function(){var b=current(),i=st.list.indexOf(b); if(i<st.list.length-1){st.picked=st.list[i+1].id; st.filter='すべて'; render();}});
+nextBtn.addEventListener('click',function(){var b=current(),i=st.list.indexOf(b); if(i>0){st.picked=st.list[i-1].id; st.filter='すべて'; render();}});
+try{var r0=parseFloat(localStorage.getItem('soho-rate')); if(r0===1||r0===1.25||r0===1.5) st.rate=r0;}catch(e){}
+
+/* ---------- data ---------- */
+function start(){
+  var cl=window.claude;
+  if(!cl||typeof cl.use!=='function'){st.db='nodb';render();return;}
+  cl.use('db').then(function(db){
+    if(!db){st.db='nodb';render();return;}
+    try{
+      db.collection('editions').orderBy('id','desc').limit(120).onSnapshot(function(snap){
+        var list=[]; snap.docs.forEach(function(d){var x=d.data();
+          if(x&&validDate(x.date)&&validSlot(x.slot)&&typeof x.headline==='string'){ if(!x.id)x.id=x.date+'-'+x.slot.replace(':',''); list.push(x); }});
+        list.sort(function(a,b){return a.id<b.id?1:a.id>b.id?-1:0;});
+        st.list=list; st.db='ready';
+        if(st.picked&&!list.some(function(x){return x.id===st.picked;})) st.picked=null;
+        render();
+      },function(){st.db='error';render();});
+      db.doc('structure/current').onSnapshot(function(snap){st.structure=snap.exists?snap.data():null; render();},function(){});
+    }catch(e){st.db='error';render();}
+  },function(){st.db='nodb';render();});
+}
+start();
+})();
+</script>
+
+</body></html>
